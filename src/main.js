@@ -10,6 +10,7 @@ import SimpleLightbox from 'simplelightbox';
 import 'simplelightbox/dist/simple-lightbox.min.css';
 
 import icon from './img/error.svg';
+import iconalert from './img/alert.svg';
 
 const form = document.querySelector('.form');
 const gallery = document.querySelector('.gallery');
@@ -86,7 +87,7 @@ async function handleSubmit(event) {
 
 async function handleLoad(event) {
   loader.classList.remove('hidden');
-  button.disabled = true;
+  button.classList.replace('btn', 'load-more-hidden');
 
   try {
     const data = await fetchImages(currentSearch, currentPage, PER_PAGE);
@@ -95,11 +96,32 @@ async function handleLoad(event) {
       createMarkup(data);
       lightbox.refresh();
       currentPage += 1;
+      button.classList.replace('load-more-hidden', 'btn');
 
       if (data.hits.length < PER_PAGE) {
         button.classList.replace('btn', 'load-more-hidden');
-        console.log('lll');
+        iziToast.error({
+          backgroundColor: '#B3DAFF',
+          position: 'topRight',
+          titleColor: '#fff',
+          message: "We're sorry, but you've reached the end of search results.",
+          messageColor: '#fff',
+          messageSize: '16',
+          iconColor: '#fff',
+          iconUrl: iconalert,
+          timeout: 3000,
+          maxWidth: 432,
+        });
       }
+
+      const galleryItem = document.querySelector('.gallery-item');
+      const itemHeight = galleryItem.getBoundingClientRect().height;
+
+      window.scrollBy({
+        left: 0,
+        top: itemHeight * 2,
+        behavior: 'smooth',
+      });
     } else {
       button.classList.replace('btn', 'load-more-hidden');
     }
